@@ -21,8 +21,8 @@ INPUT = np.array([[0,0],[0,1],[1,0],[1,1]])
 TARGET = np.array([0,1,1,0])
 
 # call this function before Sigmoid to get num
-def GetSigmoidInput(input1, input2, weight1, weight2, bias):
-    return (input1 * weight1) + (input2 * weight2) - bias
+def GetSigmoidInput(input1, input2, weight1, weight2):#, bias):
+    return (input1 * weight1) + (input2 * weight2)# - bias
 
 # propgate forward
 def Sigmoid(num):
@@ -37,8 +37,8 @@ def CalculateErrorHiddenLayer(Neuron, Weight, backPropVal):
 def UpdateWeight(neuronError, neuron):
     return LEARNING_RATE * neuronError * neuron
 
-def UpdateBias(neuronError, bias):
-    return LEARNING_RATE * bias * neuronError
+def UpdateBias(neuronError):#, bias):
+    return LEARNING_RATE * neuronError# * bias
 
 # Train the neural network
 def TrainAi():
@@ -51,9 +51,9 @@ def TrainAi():
     weight6 = np.random.rand() # goes to N5
 
     # Biases
-    bias1 = np.random.rand() # goes to N3
-    bias2 = np.random.rand() # goes to N4
-    bias3 = np.random.rand() # goes to N5
+    # bias1 = np.random.rand() # goes to N3
+    # bias2 = np.random.rand() # goes to N4
+    # bias3 = np.random.rand() # goes to N5
     for j in range(100000):
         for i in range(4):
             # forward propagation
@@ -61,13 +61,13 @@ def TrainAi():
             input1 = INPUT[i][ONE]
             target = TARGET[i]
 
-            Neuron3 = GetSigmoidInput(input0, input1, weight1, weight2, bias1)
-            Neuron4 = GetSigmoidInput(input0, input1, weight3, weight4, bias2)
+            Neuron3 = GetSigmoidInput(input0, input1, weight1, weight2)#, bias1)
+            Neuron4 = GetSigmoidInput(input0, input1, weight3, weight4)#, bias2)
 
             Neuron3 = Sigmoid(Neuron3)
             Neuron4 = Sigmoid(Neuron4)
 
-            Neuron5 = GetSigmoidInput(Neuron3, Neuron4, weight5, weight6, bias3)
+            Neuron5 = GetSigmoidInput(Neuron3, Neuron4, weight5, weight6)#, bias3)
             Neuron5 = Sigmoid(Neuron5)
 
             # Print the results
@@ -90,4 +90,9 @@ def TrainAi():
             weight3 += UpdateWeight(Neuron4Error, input0)
             weight2 += UpdateWeight(Neuron3Error, input1)
             weight1 += UpdateWeight(Neuron3Error, input0)
+
+            # update biases
+            # bias3 += UpdateBias(Neuron5Error, bias3)
+            # bias2 += UpdateBias(Neuron4Error, bias2)
+            # bias1 += UpdateBias(Neuron3Error, bias1)
 TrainAi()
