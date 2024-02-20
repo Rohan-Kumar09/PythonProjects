@@ -12,19 +12,6 @@ ONE = 1
 
 # N2 -> N4 -> N5
 
-# Weights
-weight1 = np.random.rand() # goes to N3
-weight2 = np.random.rand() # goes to N3
-weight3 = np.random.rand() # goes to N4
-weight4 = np.random.rand() # goes to N4
-weight5 = np.random.rand() # goes to N5
-weight6 = np.random.rand() # goes to N5
-
-# Biases
-bias1 = np.random.rand() # goes to N3
-bias2 = np.random.rand() # goes to N4
-bias3 = np.random.rand() # goes to N5
-
 LEARNING_RATE = 0.1
 
 # input data
@@ -41,45 +28,66 @@ def GetSigmoidInput(input1, input2, weight1, weight2, bias):
 def Sigmoid(num):
     return 1 / (1 + math.exp(-num))
 
-def CalculateError(Neuron):
-    return Neuron * (1 - Neuron) * (TARGET - Neuron)
+def CalculateErrorLastLayer(Neuron, target):
+    return Neuron * (1 - Neuron) * (target - Neuron)
 
-def UpdateWeight(Weight, Error, Bias):
-    return Weight + LEARNING_RATE * -Bias * Error
+def CalculateErrorHiddenLayer(Neuron, Weight, backPropVal):
+    return Neuron * (1 - Neuron) * (Weight * backPropVal)
 
-def UpdateBias(Bias, Error):
-    return Bias + LEARNING_RATE * -Bias * Error
+def UpdateWeight(neuronError, neuron):
+    return LEARNING_RATE * neuronError * neuron
+
+def UpdateBias(neuronError, bias):
+    return LEARNING_RATE * bias * neuronError
 
 # Train the neural network
 def TrainAi():
+    # Weights
+    weight1 = np.random.rand() # goes to N3
+    weight2 = np.random.rand() # goes to N3
+    weight3 = np.random.rand() # goes to N4
+    weight4 = np.random.rand() # goes to N4
+    weight5 = np.random.rand() # goes to N5
+    weight6 = np.random.rand() # goes to N5
 
-    # for j in range(10000):
-    for i in range(4):
-        # forward propagation
-        input0 = INPUT[i][ZERO]
-        input1 = INPUT[i][ONE]
-        target = TARGET[i]
+    # Biases
+    bias1 = np.random.rand() # goes to N3
+    bias2 = np.random.rand() # goes to N4
+    bias3 = np.random.rand() # goes to N5
+    for j in range(100000):
+        for i in range(4):
+            # forward propagation
+            input0 = INPUT[i][ZERO]
+            input1 = INPUT[i][ONE]
+            target = TARGET[i]
 
-        Neuron3 = GetSigmoidInput(input0, input1, weight1, weight2, bias1)
-        Neuron4 = GetSigmoidInput(input0, input1, weight3, weight4, bias2)
+            Neuron3 = GetSigmoidInput(input0, input1, weight1, weight2, bias1)
+            Neuron4 = GetSigmoidInput(input0, input1, weight3, weight4, bias2)
 
-        Neuron3 = Sigmoid(Neuron3)
-        Neuron4 = Sigmoid(Neuron4)
+            Neuron3 = Sigmoid(Neuron3)
+            Neuron4 = Sigmoid(Neuron4)
 
-        Neuron5 = GetSigmoidInput(Neuron3, Neuron4, weight5, weight6, bias3)
-        Neuron5 = Sigmoid(Neuron5)
+            Neuron5 = GetSigmoidInput(Neuron3, Neuron4, weight5, weight6, bias3)
+            Neuron5 = Sigmoid(Neuron5)
 
-        # Print the results
-        print("Input:", input0, input1, end=" | ", sep=" ")
-        print("TARGET:", target, end=" | ", sep=" ")
-        print(Neuron5)
+            # Print the results
+            if j == 99999:
+                print("Input:", input0, input1, end=" | ", sep=" ")
+                print("TARGET:", target, end=" | ", sep=" ")
+                print(Neuron5)
 
-        error = target - Neuron5
-        # back propagation
-        Neuron5Error = CalculateError(Neuron5)
+            error = target - Neuron5
 
+            # back propagation
+            Neuron5Error = CalculateErrorLastLayer(Neuron5, target)
+            Neuron3Error = CalculateErrorHiddenLayer(Neuron3, weight5, Neuron5Error)
+            Neuron4Error = CalculateErrorHiddenLayer(Neuron4, weight6, Neuron5Error)
 
-
-
-
+            # update weights
+            weight6 += UpdateWeight(Neuron5Error, Neuron4)
+            weight5 += UpdateWeight(Neuron5Error, Neuron3)
+            weight4 += UpdateWeight(Neuron4Error, input1)
+            weight3 += UpdateWeight(Neuron4Error, input0)
+            weight2 += UpdateWeight(Neuron3Error, input1)
+            weight1 += UpdateWeight(Neuron3Error, input0)
 TrainAi()
